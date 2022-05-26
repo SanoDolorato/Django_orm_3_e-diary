@@ -1,5 +1,4 @@
 import random
-import re
 
 from datacenter.models import Schoolkid, Mark, Chastisement, Commendation, Lesson
 

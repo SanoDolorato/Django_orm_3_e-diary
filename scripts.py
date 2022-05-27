@@ -43,33 +43,28 @@ def get_schoolkid(name_schoolkid: str) -> Schoolkid:
 
 
 def fix_marks(name_schoolkid: str) -> None:
-    db_name_schoolkid = get_schoolkid(name_schoolkid)
-    if db_name_schoolkid is None:
+    child_name = get_schoolkid(name_schoolkid)
+    if not child_name:
         return
-    mark_childs = Mark.objects.filter(schoolkid=db_name_schoolkid, points__lt=4)
-    for mark_child in mark_childs:
-        mark_child.points = 5
-        mark_child.save()
+    Mark.objects.filter(schoolkid=child_name, points__lt=4).update(points=5)
 
 
 def remove_chastisements(name_schoolkid: str) -> None:
-    db_name_schoolkid = get_schoolkid(name_schoolkid)
-    if db_name_schoolkid is None:
+    child_name = get_schoolkid(name_schoolkid)
+    if not child_name:
         return
-    chastisements = Chastisement.objects.filter(schoolkid=db_name_schoolkid)
-    for chastisement in chastisements:
-        chastisement.delete()
+    chastisements = Chastisement.objects.filter(schoolkid=child_name)
+    chastisements.delete()
 
 
 def create_commendation(name_schoolkid: str, subject: str) -> None:
-    db_name_schoolkid = get_schoolkid(name_schoolkid)
-    if db_name_schoolkid is None:
+    child_name = get_schoolkid(name_schoolkid)
+    if not child_name:
         return
-
     lesson = Lesson.objects.filter(
             subject__title=subject,
-            group_letter=db_name_schoolkid.group_letter,
-            year_of_study=db_name_schoolkid.year_of_study,
+            group_letter=child_name.group_letter,
+            year_of_study=child_name.year_of_study,
         ).order_by("-date").first()
     if not lesson:
         print("Такого урока нет. Возможно, вы допустили опечатку")
@@ -77,7 +72,7 @@ def create_commendation(name_schoolkid: str, subject: str) -> None:
     Commendation.objects.create(
         text=random.choice(commendation_example),
         created=lesson.date,
-        schoolkid=db_name_schoolkid,
+        schoolkid=child_name,
         subject=lesson.subject,
         teacher=lesson.teacher,
     )
